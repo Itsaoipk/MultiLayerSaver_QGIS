@@ -168,16 +168,20 @@ def _stil_speichern(layer, shp_pfad):
             ausnahme
         )
 
-    fehler_text = ""
+    erfolg = False
     if isinstance(ergebnis, (tuple, list)):
-        fehler_text = str(ergebnis[0] or "")
+        erfolg = bool(ergebnis[-1]) if len(ergebnis) > 1 else False
     else:
-        fehler_text = str(ergebnis or "")
+        erfolg = bool(ergebnis)
 
-    if fehler_text.strip():
-        return "QML-Stil gespeichert mit Hinweis: {}".format(
-            fehler_text
+    if not erfolg:
+        detail = ergebnis if isinstance(ergebnis, str) else str(ergebnis)
+        return "Stil konnte nicht gespeichert werden: {}".format(
+            detail
         )
+
+    if not os.path.exists(qml_pfad):
+        return "QML-Stildatei fehlt: {}".format(qml_pfad)
 
     return None
 
