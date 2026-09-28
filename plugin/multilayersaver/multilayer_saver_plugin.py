@@ -8,7 +8,10 @@ Checkbox -> Format waehlen (Shapefiles + QML Standard, GeoPackage
 optional) -> speichern und im Layerstack ersetzen.
 """
 
+import os
+
 from qgis.PyQt.QtWidgets import QAction, QMessageBox
+from qgis.PyQt.QtGui import QIcon
 
 from .auswahl_dialog import LayerAuswahlDialog
 from .speicher_logik import speichern, temporaere_layer_sammeln
@@ -21,9 +24,16 @@ class MultiLayerSaverPlugin:
         self.aktion = None
 
     def initGui(self):
+        icon_pfad = os.path.join(
+            os.path.dirname(__file__), "icon.svg"
+        )
         self.aktion = QAction(
+            QIcon(icon_pfad),
             "Temporäre Layer speichern",
             self.iface.mainWindow()
+        )
+        self.aktion.setToolTip(
+            "Temporäre Layer speichern (inkl. Styling und Beschriftung)"
         )
         self.aktion.triggered.connect(self.starten)
 

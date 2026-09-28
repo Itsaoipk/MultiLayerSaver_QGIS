@@ -25,6 +25,10 @@ exakt identisch aus.
 | **Shapefiles + QML** | ✅ | `.shp` pro Layer, Styling + Labeling als `.qml` daneben. Weitergabe-freundlich (z. B. Landesdenkmalpflege). |
 | GeoPackage | optional | Alle Layer in einer `.gpkg`. |
 
+## Versionshistorie
+
+- **v0.2.0** – **Toolbar-Button mit eigenem SVG-Icon:** "Temporäre Layer speichern" zeigt in der QGIS-Werkzeugleiste jetzt ein eigenes Icon (drei gestapelte Layer-Rauten – der Layerstack – mit grüner Diskette als Speichern-Symbol, `icon.svg`); gilt via `metadata.txt` auch als Plugin-Symbol im Erweiterungs-Dialog. Tooltip beim Hovern. Der Toolbar-Button war bereits vorhanden, hatte bisher aber nur ein Text-Label. Menüeintrag bleibt parallel bestehen.
+
 ## Bedienung
 
 1. **Erweiterungen → MultiLayerSaver → „Temporäre Layer speichern"**
