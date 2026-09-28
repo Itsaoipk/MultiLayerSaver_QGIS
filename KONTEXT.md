@@ -1,6 +1,7 @@
 # MultiLayerSaver_QGIS – Projektkontext
 
 **Stand: 28.09.2026 – v0.1.0 funktioniert im Test (Owner-bestätigt)**
+**Update: v0.2.0 – Toolbar-Button hat jetzt ein eigenes SVG-Icon (icon.svg: drei gestapelte Layer-Rauten + gruene Diskette), Icon auch in metadata.txt als Plugin-Symbol eingetragen. Nutzer-Wunsch war Icon-Anpassung wie beim Raster-Plugin ("drei Disketten uebereinander" - geloest als Layerstack + Diskette, da das Plugin Layer-Stacks speichert).**
 
 Dieses Dokument sichert den Projektverlauf aus dem Entwicklungs-Chat,
 damit die Arbeit angesetzt werden kann, wenn der Chat verloren geht.

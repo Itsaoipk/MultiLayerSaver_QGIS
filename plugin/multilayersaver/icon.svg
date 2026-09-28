@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <!-- Drei Layer-Rauten gestapelt (Layerstack, wie im QGIS-Layerpanel) -->
+  <!-- hinterste Schicht -->
+  <polyline points="12,9 21,13.5 12,18 3,13.5"
+            fill="#c9d6e4" stroke="#4a4a4a" stroke-width="1"
+            stroke-linejoin="round"/>
+  <!-- mittlere Schicht -->
+  <polyline points="12,6.5 21,11 12,15.5 3,11"
+            fill="#9db8d4" stroke="#4a4a4a" stroke-width="1"
+            stroke-linejoin="round"/>
+  <!-- vorderste Schicht -->
+  <polyline points="12,4 21,8.5 12,13 3,8.5"
+            fill="#5b8dbd" stroke="#1a1a1a" stroke-width="1.2"
+            stroke-linejoin="round"/>
+  <!-- Diskette unten rechts (speichern) -->
+  <g>
+    <rect x="14.5" y="15" width="7.5" height="7.5" rx="1"
+          fill="#2e7d32" stroke="#1a1a1a" stroke-width="1"/>
+    <rect x="16.2" y="15.9" width="2.4" height="2.2"
+          fill="#ffffff" stroke="none"/>
+    <rect x="15.4" y="19.3" width="4.7" height="2.4"
+          fill="#ffffff" stroke="none"/>
+  </g>
+</svg>

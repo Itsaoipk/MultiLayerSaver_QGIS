@@ -2,7 +2,7 @@
 name=MultiLayerSaver
 qgisMinimumVersion=3.16
 description=Speichert mehrere temporäre Layer gleichzeitig als Shapefiles (mit Stil und Beschriftung als QML) oder GeoPackage und ersetzt sie im Layerstack.
-version=0.1.0
+version=0.2.0
 author=Itsaoipk
 email=Itsaoipk@users.noreply.github.com
 about=MultiLayerSaver speichert temporäre (Memory-)Layer von QGIS-Plugins dauerhaft ab - inklusive Styling und Labeling - und ersetzt die temporären Layer an derselben Stelle im Layerstack.
@@ -10,6 +10,6 @@ tracker=https://github.com/Itsaoipk/MultiLayerSaver_QGIS/issues
 repository=https://github.com/Itsaoipk/MultiLayerSaver_QGIS
 tags=vector,shapefile,geopackage,style,labeling,temporary,layers
 category=Vector
-icon=
+icon=icon.svg
 experimental=True
 deprecated=False
