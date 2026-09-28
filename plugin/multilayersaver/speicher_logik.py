@@ -229,6 +229,8 @@ def _im_layerstack_ersetzen(knoten, ziel):
         QgsProject.instance().addMapLayer(ziel)
         return
 
+    alte_id = knoten.layerId()
+
     position = 0
     kinder = parent.children()
     for index, kind in enumerate(kinder):
@@ -241,7 +243,7 @@ def _im_layerstack_ersetzen(knoten, ziel):
     QgsProject.instance().addMapLayer(ziel, False)
     parent.insertChildNode(position, QgsLayerTreeLayer(ziel))
 
-    QgsProject.instance().removeMapLayer(knoten.layer().id())
+    QgsProject.instance().removeMapLayer(alte_id)
 
 
 def speichern(auswahl, ziel, format_):
@@ -257,6 +259,8 @@ def speichern(auswahl, ziel, format_):
 
     for knoten, layer in auswahl:
 
+        name = layer.name()
+
         shp_pfad = None
         meldung = None
 
@@ -267,31 +271,31 @@ def speichern(auswahl, ziel, format_):
             gpkg_index += 1
 
         if meldung:
-            fehler.append("{}: {}".format(layer.name(), meldung))
+            fehler.append("{}: {}".format(name, meldung))
             continue
 
         if shp_pfad is not None:
             qml_meldung = _stil_speichern(layer, shp_pfad)
             if qml_meldung:
-                fehler.append("{}: {}".format(layer.name(), qml_meldung))
+                fehler.append("{}: {}".format(name, qml_meldung))
                 continue
 
         gpkg_layername = (
-            _gpkg_layername(layer.name()) if format_ == "geopackage"
+            _gpkg_layername(name) if format_ == "geopackage"
             else None
         )
         ziel_layer, meldung = _gespeicherten_laden(
-            shp_pfad, ziel, gpkg_layername, layer.name()
+            shp_pfad, ziel, gpkg_layername, name
         )
 
         if meldung:
-            fehler.append("{}: {}".format(layer.name(), meldung))
+            fehler.append("{}: {}".format(name, meldung))
             continue
 
         if shp_pfad is not None:
             _stil_laden(ziel_layer, shp_pfad)
 
+        erfolgte.append(name)
         _im_layerstack_ersetzen(knoten, ziel_layer)
-        erfolgte.append(layer.name())
 
     return erfolgte, fehler
