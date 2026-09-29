@@ -156,10 +156,36 @@ def _gpkg_speichern(layer, gpkg_pfad, index):
     return None
 
 
-def _stil_speichern(layer, shp_pfad):
-    """QML-Stildatei neben das Shapefile schreiben (inkl. Labeling)."""
+def _qml_pfad_fuer(format_, ziel, shp_pfad, name):
+    """QML-Stildatei-Pfad je Format bestimmen.
 
-    qml_pfad = os.path.splitext(shp_pfad)[0] + ".qml"
+    Shapefile: QML liegt neben der .shp (gleicher Basisname).
+    GeoPackage: QMLs liegen im Unterordner 'styles' neben der .gpkg,
+    Dateiname vom ORIGINALEN Layernamen abgeleitet (der geladene
+    Layer heisst wieder Original-Name, nicht der bereinigte
+    Tabellenname).
+    """
+
+    if format_ == "geopackage":
+        ordner = os.path.join(
+            os.path.dirname(ziel) or ".", "styles"
+        )
+        try:
+            os.makedirs(ordner, exist_ok=True)
+        except OSError as ausnahme:
+            return None, (
+                "Stilordner konnte nicht angelegt werden: {}".format(
+                    ausnahme
+                )
+            )
+        basis = os.path.join(ordner, dateiname_bereinigen(name))
+        return basis + ".qml", None
+
+    return os.path.splitext(shp_pfad)[0] + ".qml", None
+
+
+def _stil_speichern(layer, qml_pfad):
+    """QML-Stildatei schreiben (inkl. Labeling)."""
 
     try:
         ergebnis = layer.saveNamedStyle(qml_pfad)
@@ -204,12 +230,11 @@ def _gespeicherten_laden(shp_pfad, gpkg_pfad, gpkg_layername, name):
     return ziel, None
 
 
-def _stil_laden(ziel, shp_pfad):
+def _stil_laden(ziel, qml_pfad):
     """QML-Stil auf den geladenen Layer anwenden (falls vorhanden)."""
 
-    if shp_pfad is None:
+    if qml_pfad is None:
         return
-    qml_pfad = os.path.splitext(shp_pfad)[0] + ".qml"
     if not os.path.exists(qml_pfad):
         return
     try:
@@ -274,11 +299,17 @@ def speichern(auswahl, ziel, format_):
             fehler.append("{}: {}".format(name, meldung))
             continue
 
-        if shp_pfad is not None:
-            qml_meldung = _stil_speichern(layer, shp_pfad)
-            if qml_meldung:
-                fehler.append("{}: {}".format(name, qml_meldung))
-                continue
+        qml_pfad, meldung = _qml_pfad_fuer(
+            format_, ziel, shp_pfad, name
+        )
+        if meldung:
+            fehler.append("{}: {}".format(name, meldung))
+            continue
+
+        qml_meldung = _stil_speichern(layer, qml_pfad)
+        if qml_meldung:
+            fehler.append("{}: {}".format(name, qml_meldung))
+            continue
 
         gpkg_layername = (
             _gpkg_layername(name) if format_ == "geopackage"
@@ -292,8 +323,7 @@ def speichern(auswahl, ziel, format_):
             fehler.append("{}: {}".format(name, meldung))
             continue
 
-        if shp_pfad is not None:
-            _stil_laden(ziel_layer, shp_pfad)
+        _stil_laden(ziel_layer, qml_pfad)
 
         erfolgte.append(name)
         _im_layerstack_ersetzen(knoten, ziel_layer)

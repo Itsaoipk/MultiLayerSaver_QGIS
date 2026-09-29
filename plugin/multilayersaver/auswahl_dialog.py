@@ -108,7 +108,8 @@ class LayerAuswahlDialog:
         format_layout.addWidget(shape_radio)
 
         gpkg_radio = QRadioButton(
-            "GeoPackage (alle Layer in einer Datei)"
+            "GeoPackage (alle Layer in einer Datei, Stile im "
+            "Unterordner 'styles')"
         )
         format_layout.addWidget(gpkg_radio)
 
