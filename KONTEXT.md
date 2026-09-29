@@ -2,14 +2,21 @@
 
 **Stand: 28.09.2026 – v0.1.0 funktioniert im Test (Owner-bestätigt)**
 
-> **OFFENER PUNKT FÜR NÄCHSTE SESSION (vormerken!):**
-> **Bug GeoPackage-Modus: Stile/Beschriftungen werden NICHT übernommen**
-> (Details und Fixplan siehe unten "OFFEN: GeoPackage-Stil-Fix")
+> ~~**OFFENER PUNKT: Bug GeoPackage-Modus**~~ → **ERLEDIGT 29.09.2026**
+> (Commit `04d7f52`, siehe "ERLEDIGT: GeoPackage-Stil-Fix")
 
 Dieses Dokument sichert den Projektverlauf aus dem Entwicklungs-Chat,
 damit die Arbeit angesetzt werden kann, wenn der Chat verloren geht.
 
-## OFFEN: GeoPackage-Stil-Fix (nächste Session, vormerken!)
+## ERLEDIGT: GeoPackage-Stil-Fix (29.09.2026, Commit 04d7f52)
+
+**Fix umgesetzt wie geplant:** Neue Funktion `_qml_pfad_fuer(format_, ziel,
+shp_pfad, name)` bestimmt den QML-Pfad je Format: Shapefile → neben der
+.shp; GeoPackage → Unterordner `styles/` neben der .gpkg, Dateiname vom
+ORIGINALEN Layernamen (nicht Tabellenname). `_stil_speichern` und
+`_stil_laden` arbeiten generisch auf dem QML-Pfad und laufen jetzt in
+BEIDEN Formaten. Dialog-Beschreibung erweitert.
+**Status: wartet auf Owner-Test in QGIS.**
 
 **Gemeldet von Owner (28.09.2026):** Wählt man im Dialog **GeoPackage**
 als Format, werden Stile und Beschriftungen NICHT auf die gespeicherten
@@ -33,30 +40,21 @@ angewendet. GeoPackage selbst speichert die Stile NICHT im File,
 QGIS liest sie auch nicht automatisch → alle Layer erscheinen im
 Default-Stil ohne Labeling.
 
-**Fixplan (morgen umsetzen):**
-1. Auch im GeoPackage-Modus pro Layer eine QML-Datei schreiben –
-   Pfad: `<gpkg_pfad ohne Endung>_<layername>.qml` (oder QMLs in
-   Unterordner `styles/` neben der .gpkg)
-   → `_stil_speichern()` so erweitern, dass es statt `shp_pfad` einen
-   generischen `qml_pfad` bekommt; Aufrufer baut den Pfad je Format
-2. `_gespeicherten_laden()` gibt den QML-Pfad mit zurück (oder in
-   `speichern()` den Pfad je Format bestimmen)
-3. `_stil_laden(ziel_layer, qml_pfad)` im GeoPackage-Zweig ebenfalls
-   aufrufen (Doppelte Ausführung `if shp_pfad is not None` durch
-   `if qml_pfad is not None` ersetzen)
-4. Achtung QGPX-Besonderheit: `_gpkg_layername()` bereinigt den Namen
-   für die Tabelle (`"Ticks und Sub-Ticks"` → ggf. Leerzeichen!).
-   QML-Dateiname sollte vom ORIGINAL-Layernamen abgeleitet werden
-   (der geladene Layer heißt wieder Original-Name), NICHT vom
-   Tabellennamen.
-5. Test: beide Formate durchspielen; Layerstack-Ersetzung muss in
-   beiden Modi laufen; Labeling muss im Kartenbild sichtbar bleiben
+**Ursprünglicher Fixplan (der Umsetzung zugrunde gelegen):**
+1. QML-Datei je Layer schreiben – im GeoPackage-Modus Unterordner
+   `styles/` neben der .gpkg → umgesetzt via `_qml_pfad_fuer()`
+2. `_gespeicherten_laden()` – QML-Pfad zentral in `speichern()`
+   bestimmen → umgesetzt
+3. `_stil_laden(ziel_layer, qml_pfad)` in beiden Modi aufrufen →
+   umgesetzt (`if qml_pfad is not None`-Logik, kein `shp_pfad`-Check
+   mehr fürs Styling)
+4. QML-Dateiname vom ORIGINAL-Layernamen ableiten → umgesetzt
+   (`dateiname_bereinigen(name)` im styles/-Ordner)
+5. Test beider Formate → **offen, Owner testet**
 
-**Alternative (falls QML-Dateien neben .gpkg unerwünscht):**
-Stil in die QGIS-Stildatenbank des Projekts schreiben
-(`layer.saveStyleToDatabase()` vgl. QGIS-Doku) – ist aber an das
-Projekt gebunden, nicht portabel. QML-Dateien sind die bessere
-Lösung (mit .gpkg zusammen weitergebbar).
+**Alternative (verworfen):** `saveStyleToDatabase()` – projektgebunden,
+nicht portabel. QML-Dateien sind die bessere Lösung (mit .gpkg
+zusammen weitergebbar).
 
 **Zusätzlich gemeldet/geplant (siehe unten 'Offene Ideen'):**
 - Zielordner in QGIS-Einstellungen merken
