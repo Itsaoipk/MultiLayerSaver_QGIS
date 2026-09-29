@@ -230,15 +230,43 @@ def _gespeicherten_laden(shp_pfad, gpkg_pfad, gpkg_layername, name):
     return ziel, None
 
 
-def _stil_laden(ziel, qml_pfad):
-    """QML-Stil auf den geladenen Layer anwenden (falls vorhanden)."""
+def _stil_laden(ziel, qml_pfad, quelle):
+    """QML-Stil auf den geladenen Layer anwenden (falls vorhanden).
+
+    Wichtig (vgl. qgis/QGIS#54515): Bei Datenbank-Layern (GeoPackage!)
+    laedt loadNamedStyle(pfad) ohne zusaetzliches True-Flag NICHT die
+    QML-Datei, sondern einen vorhandenen Default-Stil aus der
+    Stildatenbank. Das True-Flag erzwingt das Laden aus der Datei.
+    """
 
     if qml_pfad is None:
         return
     if not os.path.exists(qml_pfad):
         return
+
+    geladen = False
     try:
-        ziel.loadNamedStyle(qml_pfad)
+        ziel.loadNamedStyle(qml_pfad, True)
+        geladen = True
+    except TypeError:
+        try:
+            ziel.loadNamedStyle(qml_pfad)
+            geladen = True
+        except Exception:
+            pass
+    except Exception:
+        pass
+
+    if not geladen:
+        return
+
+    try:
+        ziel.setLabelsEnabled(quelle.labelsEnabled())
+    except Exception:
+        pass
+
+    try:
+        ziel.triggerRepaint()
     except Exception:
         pass
 
@@ -323,7 +351,7 @@ def speichern(auswahl, ziel, format_):
             fehler.append("{}: {}".format(name, meldung))
             continue
 
-        _stil_laden(ziel_layer, qml_pfad)
+        _stil_laden(ziel_layer, qml_pfad, layer)
 
         erfolgte.append(name)
         _im_layerstack_ersetzen(knoten, ziel_layer)
