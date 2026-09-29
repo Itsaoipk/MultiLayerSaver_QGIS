@@ -181,3 +181,72 @@ Layer (alle vorausgewählt) prüfen, Zielordner wählen, Format belassen
 - Feldnamen max. 10 Zeichen
 - ein Geometrietyp pro Layer
 - Umlaute in Feldnamen werden ggf. angepasst
+
+## FAQ: "Hey, wie war das nochmal mit QML, Shapefile und dem Kram?"
+
+**Für alle, die es kurz brauchen (Dummies-Erklärung, bitte erhalten!):**
+
+### Was ist ein Shapefile?
+Keine einzelne Datei, sondern ein Satz von mindestens 4 Dateien,
+die zusammengehören (QGIS zeigt sie als eine an):
+```
+Achsen.shp  -> Geometrie (WO ist die Linie)
+Achsen.shx  -> Index (wo steht was in der .shp)
+Achsen.dbf  -> Attributtabelle (WAS ist es: Typ, Laenge)
+Achsen.prj  -> Koordinatensystem
+```
+Vorteile: Ur-Standard, JEDE Software liest es (ArcGIS, CAD,
+Landesdenkmalpflege...). Nachteile: 4+ Dateien, Feldnamen max.
+10 Zeichen, Umlaute boesen, nur ein Geometrietyp pro Layer.
+
+### Was ist ein GeoPackage?
+EINE einzige .gpkg-Datei (= kleine SQLite-Datenbank), in der alle
+Layer stecken. Vorteile: eine Datei fuer alles, laengere Feldnamen,
+mehrere Layer. Nachteile: juengeres Format, aeltere Systeme koennen
+es evtl. nicht lesen (und Owner hatte schon Probleme damit).
+Merksatz: Shapefile = Mappe mit losen Blaettern (jeder kann lesen,
+Blaetter koennen fehlen). GeoPackage = Schnellhefter mit allem
+zusammen.
+
+### Was ist QML?
+Die "Frisier-Anweisung" fuer einen Layer: Farbe, Linienbreite,
+Schriftgroesse, wo die Beschriftungen sitzen. Die .shp sagt WO etwas
+ist - die QML sagt, WIE es aussieht.
+WICHTIG: Shapefiles koennen KEIN Styling speichern (1980er-Format).
+Deshalb liegt die QML NEBEN den Daten (gleicher Basisname):
+```
+Achsen.shp   <- Daten
+Achsen.qml   <- Stil/Labeling-Anweisung
+```
+(Fussnote: QML heisst hier "QGIS Markup Language" - hat NICHTS mit
+der Qt-Programmiersprache QML zu tun.)
+
+### Woher weiss ein Shapefile, wie es aussieht?
+Es WEISS ES NICHT. QGIS muss sich den Stil woanders holen:
+1. aus dem Projekt-Protokoll (.qgz/.qgs) - Normalfall
+2. aus einer QML-Datei neben den Daten
+3. aus der persoenlichen Stildatenbank (qgis.db im Profil)
+4. sonst: Zufalls-Default-Stil (bunt, ohne Labeling)
+
+### Wie macht QGIS das ohne unser Plugin?
+Ueber das PROJEKT: Die .qgs/.qgz speichert fuer jeden Layer die
+komplette Stil-Anweisung. Deshalb sieht gespeichertes Projekt immer
+gleich aus. ABER: Projekt weg = Stil weg. Fuer Weitergabe
+(Landesdenkmalpflege, Kollegen, Archiv) braucht es die QML neben
+den Daten - genau das schreibt unser Plugin automatisch.
+
+### Warum ging GeoPackage-Stil verloren (der Bug von 29.09.)?
+Eine .gpkg IST eine Datenbank. QGIS behandelt sie wie eine DB-
+Verbindung: loadNamedStyle(pfad) suchte zuerst einen Stil IN der
+Datenbank statt die QML-Datei zu lesen -> Layer kamen im Default-
+Stil ohne Labeling. Fix laut qgis/QGIS#54515:
+`loadNamedStyle(qml_pfad, True)` - das True erzwingt das Laden aus
+der DATEI. Zusaetzlich setLabelsEnabled(quelle.labelsEnabled())
+und triggerRepaint().
+
+### WTF ist ein AST-Check?
+Der Computer "liest" den Code vor dem Upload und prueft seine
+Struktur (z.B.: wird die neue Funktion ueberall mit 4 Argumenten
+aufgerufen?). py_compile = Rechtschreibpruefung (Klammern...),
+AST = Logik-Trockentest. QGIS laeuft in der Sandbox nicht, deshalb
+ist der Owner-Test in QGIS der wahre Pruefstand.
