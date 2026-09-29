@@ -182,6 +182,33 @@ Layer (alle vorausgewählt) prüfen, Zielordner wählen, Format belassen
 - ein Geometrietyp pro Layer
 - Umlaute in Feldnamen werden ggf. angepasst
 
+## Workflow-Empfehlung (Owner-abgesegnet)
+
+**GeoPackage als Arbeitsformat, Shapefile als Abgabeformat:**
+
+- **Tägliche Arbeit / Archiv / eigener Datenbestand → GeoPackage:**
+  eine Datei pro Datensatz statt 40+ Einzeldateien, keine verlorenen
+  .dbf/.prj beim Kopieren, lange Feldnamen + Umlute ok, beliebig viele
+  Layer in einer .gpkg (perfekt für Profil-Aufmaße).
+- **Weitergabe nach außen (Landesdenkmalpflege, Behörden, ArcGIS-
+  Häuser) → Shapefile:** Ur-Standard, jede Software liest es,
+  10-Zeichen-Feldnamen-Limits sind bei den Plugin-Layern unkritisch.
+
+**Praktischer Ablauf mit MultiLayerSaver:**
+1. Bearbeitung: GeoPackage-Modus → ein File, alles drin, archivierbar
+2. Abgabe: Shapefile-Modus → Ordner mit .shp+.qml pro Layer, zippen,
+   wegschicken
+
+**Einschränkungen GeoPackage-Weg:**
+- Stil liegt NEBEN der .gpkg im styles/-Ordner → beim Weitergeben
+  den Ordner mitgeben (Empfänger mit QGIS). Für Fremd-Abgabe eh
+  Shapefile+QML nehmen.
+- Fallback bei zickenden Tools bleibt Shapefile (Owner hatte früher
+  „immer wieder Probleme mit GeoPackage" – jetzt stiltechnisch gelöst).
+
+**Kurzfazit: Daten bleiben bei Dir → GeoPackage. Daten reisen raus →
+Shapefile. Beides per Mausklick im Plugin, keine Festlegung nötig.**
+
 ## FAQ: "Hey, wie war das nochmal mit QML, Shapefile und dem Kram?"
 
 **Für alle, die es kurz brauchen (Dummies-Erklärung, bitte erhalten!):**
